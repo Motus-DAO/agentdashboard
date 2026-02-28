@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono, Jura, Orbitron } from 'next/font/google';
 import './globals.css';
 import Shell from '@/src/components/Shell';
+import WaaPProvider from '@/src/components/WaaPProvider';
+import AuthGate from '@/src/components/AuthGate';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' });
 const jura = Jura({ subsets: ['latin'], variable: '--font-heading' });
@@ -17,7 +19,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${inter.variable} ${jura.variable} ${jetbrainsMono.variable} ${orbitron.variable}`}>
-        <Shell>{children}</Shell>
+        <WaaPProvider>
+          <AuthGate>
+            <Shell>{children}</Shell>
+          </AuthGate>
+        </WaaPProvider>
       </body>
     </html>
   );

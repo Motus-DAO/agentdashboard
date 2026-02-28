@@ -24,6 +24,35 @@ function authMessage(nonce: string) {
   return `AgentDashboard auth nonce: ${nonce}`;
 }
 
+async function signWithAvailableWallet(address: string, message: string): Promise<string | null> {
+  const waapSignature = await window.waap?.request?.({
+    method: 'personal_sign',
+    params: [message, address],
+  });
+  if (typeof waapSignature === 'string' && waapSignature.length > 0) return waapSignature;
+
+  const ethereum = (window as any).ethereum;
+  if (ethereum?.request) {
+    const sig = await ethereum.request({ method: 'personal_sign', params: [message, address] });
+    if (typeof sig === 'string' && sig.length > 0) return sig;
+  }
+
+  return null;
+}
+
+async function getConnectedAddress(): Promise<string | null> {
+  const waapAccounts = await window.waap?.request?.({ method: 'eth_requestAccounts' });
+  if (Array.isArray(waapAccounts) && waapAccounts[0]) return String(waapAccounts[0]).toLowerCase();
+
+  const ethereum = (window as any).ethereum;
+  if (ethereum?.request) {
+    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+    if (Array.isArray(accounts) && accounts[0]) return String(accounts[0]).toLowerCase();
+  }
+
+  return null;
+}
+
 async function establishOwnerSession(address: string) {
   const nonceRes = await fetch('/api/auth/nonce', { method: 'GET', cache: 'no-store' });
   if (!nonceRes.ok) return false;
@@ -32,12 +61,8 @@ async function establishOwnerSession(address: string) {
   if (!nonce) return false;
 
   const message = authMessage(nonce);
-  const signature = await window.waap?.request?.({
-    method: 'personal_sign',
-    params: [message, address],
-  });
-
-  if (!signature || typeof signature !== 'string') return false;
+  const signature = await signWithAvailableWallet(address, message);
+  if (!signature) return false;
 
   const sessionRes = await fetch('/api/auth/session', {
     method: 'POST',
@@ -61,20 +86,16 @@ export default function WaaPProvider({ children }: { children: React.ReactNode }
 
     async function boot() {
       try {
-        // WaaP SDK is expected to be initialized externally (script/provider).
-        // If not present, fail gracefully without breaking the app build/runtime.
-        const accounts = await window.waap?.request?.({ method: 'eth_requestAccounts' });
-        if (!mounted) return;
-        const addr = Array.isArray(accounts) ? accounts[0] : null;
+        const addr = await getConnectedAddress();
 
+        if (!mounted) return;
         if (!addr) {
           setAddress(null);
           return;
         }
 
-        const normalized = String(addr).toLowerCase();
-        if (OWNER_WALLET && normalized !== OWNER_WALLET) {
-          setAddress(normalized);
+        if (OWNER_WALLET && addr !== OWNER_WALLET) {
+          setAddress(addr);
           return;
         }
 
@@ -82,14 +103,14 @@ export default function WaaPProvider({ children }: { children: React.ReactNode }
         const hasSession = check.ok && ((await check.json()) as { ok?: boolean }).ok;
 
         if (!hasSession) {
-          const sessionOk = await establishOwnerSession(normalized);
+          const sessionOk = await establishOwnerSession(addr);
           if (!sessionOk) {
             setAddress(null);
             return;
           }
         }
 
-        setAddress(normalized);
+        setAddress(addr);
       } catch {
         if (mounted) setAddress(null);
       } finally {
@@ -105,10 +126,12 @@ export default function WaaPProvider({ children }: { children: React.ReactNode }
     };
 
     window.waap?.on?.('accountsChanged', onAccountsChanged);
+    (window as any).ethereum?.on?.('accountsChanged', onAccountsChanged);
 
     return () => {
       mounted = false;
       window.waap?.removeListener?.('accountsChanged', onAccountsChanged);
+      (window as any).ethereum?.removeListener?.('accountsChanged', onAccountsChanged);
     };
   }, []);
 
@@ -122,8 +145,7 @@ export default function WaaPProvider({ children }: { children: React.ReactNode }
       isAuthenticated,
       login: async () => {
         await window.waap?.login?.();
-        const accounts = await window.waap?.request?.({ method: 'eth_requestAccounts' });
-        const addr = Array.isArray(accounts) ? String(accounts[0] || '').toLowerCase() : '';
+        const addr = await getConnectedAddress();
 
         if (!addr) {
           setAddress(null);
