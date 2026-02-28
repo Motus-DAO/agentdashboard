@@ -3,7 +3,7 @@
 import { useWaaP } from './WaaPProvider';
 
 export default function AuthGate({ children }: { children: React.ReactNode }) {
-  const { isReady, isAuthenticated, address, login } = useWaaP();
+  const { isReady, isAuthenticated, hasWaaP, error, address, login } = useWaaP();
 
   if (!isReady) {
     return <div className="ui-card">Checking session…</div>;
@@ -17,7 +17,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
           Sign in with the owner wallet to access AgentDashboard.
           {address ? ` Connected wallet: ${address}` : ''}
         </p>
-        <button onClick={() => void login()} className="ui-btn ui-btn-primary mt-5">
+        {error && <p className="mt-2 text-xs text-amber-300">{error}</p>}
+        <button onClick={() => void login()} disabled={!hasWaaP} className="ui-btn ui-btn-primary mt-5 disabled:opacity-50">
           Sign in with WaaP
         </button>
       </div>
