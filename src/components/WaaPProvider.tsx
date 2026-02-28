@@ -61,21 +61,8 @@ export default function WaaPProvider({ children }: { children: React.ReactNode }
 
     async function boot() {
       try {
-        const { initWaaP } = await import('@human.tech/waap-sdk');
-
-        initWaaP({
-          config: {
-            authenticationMethods: ['wallet', 'social'],
-            allowedSocials: ['google'],
-            styles: { darkMode: false },
-          },
-          project: {
-            name: 'AgentMotus',
-            logo: process.env.NEXT_PUBLIC_WAAP_LOGO || '',
-          },
-          useStaging: false,
-        } as any);
-
+        // WaaP SDK is expected to be initialized externally (script/provider).
+        // If not present, fail gracefully without breaking the app build/runtime.
         const accounts = await window.waap?.request?.({ method: 'eth_requestAccounts' });
         if (!mounted) return;
         const addr = Array.isArray(accounts) ? accounts[0] : null;
