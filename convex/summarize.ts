@@ -21,9 +21,9 @@ function getOpenAiKey(): string | null {
   return process.env[OPENAI_API_KEY_ENV] ?? null;
 }
 
-export const summarizeNextChat = action({
+export const summarizeNextChat: any = action({
   args: {},
-  handler: async (ctx) => {
+  handler: async (ctx: any): Promise<any> => {
     const serverSecret = getServerSecret();
     if (!serverSecret) {
       return { ok: false, reason: 'CONVEX_SERVER_SECRET not set' };
@@ -34,14 +34,14 @@ export const summarizeNextChat = action({
       return { ok: false, reason: 'OPENAI_API_KEY not set; summarization skipped' };
     }
 
-    const organizationId = await ctx.runQuery(api.bootstrap.getDefaultOrganizationId, {
+    const organizationId: string | null = await ctx.runQuery((api as any).bootstrap.getDefaultOrganizationId, {
       serverSecret,
     });
     if (!organizationId) {
       return { ok: false, reason: 'No default organization' };
     }
 
-    const chats = await ctx.runQuery(api.serverChats.listChatsServer, {
+    const chats: any[] = await ctx.runQuery((api as any).serverChats.listChatsServer, {
       organizationId,
       serverSecret,
     });
@@ -52,7 +52,7 @@ export const summarizeNextChat = action({
     const now = Date.now();
     for (const chat of chats) {
       const chatId = chat._id;
-      const count = await ctx.runQuery(api.serverChats.getMessageCountServer, {
+      const count: number = await ctx.runQuery((api as any).serverChats.getMessageCountServer, {
         chatId,
         serverSecret,
       });
@@ -64,7 +64,7 @@ export const summarizeNextChat = action({
         if (now - updated < SUMMARY_MAX_AGE_MS) continue;
       }
 
-      const messages = await ctx.runQuery(api.serverChats.listMessagesServer, {
+      const messages: Array<{ authorType: string; authorId?: string; content: string }> = await ctx.runQuery((api as any).serverChats.listMessagesServer, {
         chatId,
         serverSecret,
       });
@@ -118,7 +118,7 @@ export const summarizeNextChat = action({
         };
       }
 
-      await ctx.runMutation(api.serverChats.setChatSummaryServer, {
+      await ctx.runMutation((api as any).serverChats.setChatSummaryServer, {
         chatId,
         summary,
         serverSecret,

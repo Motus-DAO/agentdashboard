@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -64,7 +64,7 @@ function extractServerError(payload: ApiErrorPayload | null, fallback = 'Unknown
   return payload.error.message || payload.error.code || fallback;
 }
 
-export default function ChatsPage() {
+function ChatsPageInner() {
   const searchParams = useSearchParams();
   const [chats, setChats] = useState<Chat[]>([]);
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -423,5 +423,13 @@ export default function ChatsPage() {
         </form>
       </section>
     </div>
+  );
+}
+
+export default function ChatsPage() {
+  return (
+    <Suspense fallback={<div className="ui-card">Loading chats…</div>}>
+      <ChatsPageInner />
+    </Suspense>
   );
 }
