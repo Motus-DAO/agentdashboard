@@ -1,8 +1,12 @@
 import type { Metadata } from 'next';
+import { Inter, JetBrains_Mono, Jura, Orbitron } from 'next/font/google';
 import './globals.css';
 import Shell from '@/src/components/Shell';
-import ConvexClientProvider from '@/src/components/ConvexClientProvider';
-import WaaPProvider from '@/src/components/WaaPProvider';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-body' });
+const jura = Jura({ subsets: ['latin'], variable: '--font-heading' });
+const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
+const orbitron = Orbitron({ subsets: ['latin'], variable: '--font-display' });
 
 export const metadata: Metadata = {
   title: 'AgentDashboard',
@@ -12,12 +16,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <WaaPProvider>
-          <ConvexClientProvider>
-            <Shell>{children}</Shell>
-          </ConvexClientProvider>
-        </WaaPProvider>
+      <body className={`${inter.variable} ${jura.variable} ${jetbrainsMono.variable} ${orbitron.variable}`}>
+        <Shell>{children}</Shell>
       </body>
     </html>
   );

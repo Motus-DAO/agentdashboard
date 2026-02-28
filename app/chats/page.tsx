@@ -155,10 +155,7 @@ export default function ChatsPage() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, streamingText]);
 
-  const selectedChat = useMemo(
-    () => chats.find((c) => c._id === selectedChatId),
-    [chats, selectedChatId]
-  );
+  const selectedChat = useMemo(() => chats.find((c) => c._id === selectedChatId), [chats, selectedChatId]);
 
   async function handleCreateChat() {
     const res = await fetch('/api/chat/create', {
@@ -243,7 +240,7 @@ export default function ChatsPage() {
           setSelectedChatId(null);
           await loadState(null);
         } else if (res.status === 502 && (serverError.includes('fetch failed') || serverError.toLowerCase().includes('bridge'))) {
-          setStatusMessage(`❌ El agente no está alcanzable (bridge/túnel). Comprueba que OPENCLAW_BRIDGE_URL esté activo y el túnel corriendo.`);
+          setStatusMessage('❌ El agente no está alcanzable (bridge/túnel). Comprueba que OPENCLAW_BRIDGE_URL esté activo y el túnel corriendo.');
           await loadState(chatId);
         } else {
           setStatusMessage(`❌ Error del servidor (${res.status}): ${serverError}`);
@@ -278,30 +275,26 @@ export default function ChatsPage() {
   }
 
   return (
-    <div className="flex gap-4 h-[calc(100vh-5rem)]">
-      <div className="w-72 bg-panel border border-border rounded-xl overflow-y-auto flex-shrink-0">
-        <div className="p-4 border-b border-border space-y-3">
+    <div className="flex h-[calc(100vh-5rem)] gap-4">
+      <aside className="ui-surface w-80 flex-shrink-0 overflow-y-auto">
+        <div className="space-y-3 border-b border-white/10 p-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-sm">Threads</h3>
-            <button
-              onClick={handleCreateChat}
-              className="text-xs px-2 py-1 bg-accent hover:bg-accent-hover rounded-md text-white"
-            >
+            <h3 className="text-sm font-semibold text-white">Threads</h3>
+            <button onClick={handleCreateChat} className="ui-btn ui-btn-primary text-xs">
               + New
             </button>
           </div>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div>
-              <label className="block text-muted mb-0.5">Area</label>
+              <label className="mb-0.5 block text-white/60">Area</label>
               <select
                 value={newChatArea}
                 onChange={(e) => {
                   const a = e.target.value as AgentArea;
                   setNewChatArea(a);
-                  const opts = getSubAreasForArea(a);
-                  setNewChatSubArea(opts.length ? '' : '');
+                  setNewChatSubArea('');
                 }}
-                className="w-full bg-surface border border-border rounded px-2 py-1 text-gray-200"
+                className="ui-input"
               >
                 {AGENT_AREAS.map((a) => (
                   <option key={a} value={a}>
@@ -311,11 +304,11 @@ export default function ChatsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-muted mb-0.5">Sub-area</label>
+              <label className="mb-0.5 block text-white/60">Sub-area</label>
               <select
                 value={newChatSubArea}
                 onChange={(e) => setNewChatSubArea(e.target.value as AgentSubArea | '')}
-                className="w-full bg-surface border border-border rounded px-2 py-1 text-gray-200"
+                className="ui-input"
                 disabled={subAreaOptions.length === 0}
               >
                 <option value="">—</option>
@@ -333,63 +326,58 @@ export default function ChatsPage() {
           <button
             key={t._id}
             onClick={() => setSelectedChatId(t._id)}
-            className={`w-full text-left px-4 py-3 border-b border-border/50 hover:bg-white/[0.02] ${
-              selectedChatId === t._id ? 'bg-white/[0.03]' : ''
+            className={`w-full border-b border-white/5 px-4 py-3 text-left transition-colors hover:bg-white/[0.03] ${
+              selectedChatId === t._id ? 'bg-white/[0.04]' : ''
             }`}
           >
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium text-white truncate">{t.title}</span>
+            <div className="mb-1 flex items-center justify-between">
+              <span className="truncate text-sm font-medium text-white">{t.title}</span>
             </div>
             {t.agent && (
-              <p className="text-[10px] text-muted/80 mb-0.5">
+              <p className="mb-0.5 text-[10px] text-white/55">
                 {t.agent.name}
-                {(t.agent.area || t.agent.subArea) &&
-                  ` · ${[t.agent.area, t.agent.subArea].filter(Boolean).join(' → ')}`}
+                {(t.agent.area || t.agent.subArea) && ` · ${[t.agent.area, t.agent.subArea].filter(Boolean).join(' → ')}`}
               </p>
             )}
-            <p className="text-xs text-muted truncate">{t.lastMessage || 'No messages yet'}</p>
-            <p className="text-[10px] text-muted/60 mt-0.5">{timeLabel(t.lastMessageAt || t.updatedAt)}</p>
+            <p className="truncate text-xs text-white/70">{t.lastMessage || 'No messages yet'}</p>
+            <p className="mt-0.5 text-[10px] text-white/45">{timeLabel(t.lastMessageAt || t.updatedAt)}</p>
           </button>
         ))}
 
-        {chats.length === 0 && <p className="p-4 text-xs text-muted">No chats yet. Create one.</p>}
-      </div>
+        {chats.length === 0 && <p className="p-4 text-xs text-white/55">No chats yet. Create one.</p>}
+      </aside>
 
-      <div className="flex-1 bg-panel border border-border rounded-xl flex flex-col">
-        <div className="p-4 border-b border-border flex items-center justify-between gap-4">
+      <section className="ui-surface flex flex-1 flex-col">
+        <div className="flex items-center justify-between gap-4 border-b border-white/10 p-4">
           <div className="min-w-0">
-            <h3 className="font-semibold text-sm">{selectedChat?.title || 'Select a chat'}</h3>
+            <h3 className="truncate text-sm font-semibold text-white">{selectedChat?.title || 'Select a chat'}</h3>
             {selectedChat?.agent && (
-              <p className="text-xs text-muted mt-0.5">
+              <p className="mt-0.5 text-xs text-white/60">
                 {selectedChat.agent.name}
                 {(selectedChat.agent.area || selectedChat.agent.subArea) &&
                   ` · ${[selectedChat.agent.area, selectedChat.agent.subArea].filter(Boolean).join(' → ')}`}
               </p>
             )}
-            {statusMessage && <p className="text-[11px] text-yellow-300 mt-1 truncate">{statusMessage}</p>}
+            {statusMessage && <p className="mt-1 truncate text-[11px] text-amber-300">{statusMessage}</p>}
           </div>
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-muted">Model:</span>
-            <select
-              value={model}
-              onChange={(e) => setModel(e.target.value as ModelChoice)}
-              className="bg-surface border border-border rounded-md px-2 py-1 text-gray-200"
-            >
+            <span className="text-white/60">Model:</span>
+            <select value={model} onChange={(e) => setModel(e.target.value as ModelChoice)} className="ui-input">
               <option value="codex">Codex</option>
               <option value="opus">Opus</option>
             </select>
           </div>
         </div>
 
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto p-4">
           {messages.map((m) => (
             <div key={m._id} className={`flex flex-col ${m.authorType === 'agent' ? 'items-start' : 'items-end'}`}>
               <div
-                className={`max-w-[70%] px-4 py-2.5 rounded-xl text-sm ${
-                  m.authorType === 'agent' ? 'bg-accent/10 text-gray-200' : 'bg-white/10 text-gray-200'
+                className={`max-w-[70%] rounded-xl px-4 py-2.5 text-sm ${
+                  m.authorType === 'agent' ? 'bg-[rgba(147,51,234,0.18)] text-white' : 'bg-white/10 text-white'
                 }`}
               >
-                <p className="text-xs font-medium text-muted mb-1">
+                <p className="mb-1 text-xs font-medium text-white/60">
                   {m.authorId} · {timeLabel(m.createdAt)}
                 </p>
                 {m.authorType === 'agent' ? (
@@ -407,37 +395,33 @@ export default function ChatsPage() {
 
           {streamingText && (
             <div className="flex flex-col items-start">
-              <div className="max-w-[70%] px-4 py-2.5 rounded-xl text-sm bg-accent/10 text-gray-200">
-                <p className="text-xs font-medium text-muted mb-1">AgentMotus · now</p>
+              <div className="max-w-[70%] rounded-xl bg-[rgba(147,51,234,0.18)] px-4 py-2.5 text-sm text-white">
+                <p className="mb-1 text-xs font-medium text-white/60">AgentMotus · now</p>
                 <div className="chat-markdown whitespace-pre-wrap">{streamingText}</div>
               </div>
             </div>
           )}
 
           {messages.length === 0 && selectedChatId && (
-            <p className="text-sm text-muted">No messages yet. Send the first one.</p>
+            <p className="text-sm text-white/60">No messages yet. Send the first one.</p>
           )}
         </div>
 
-        <form onSubmit={handleSend} className="p-4 border-t border-border">
+        <form onSubmit={handleSend} className="border-t border-white/10 p-4">
           <div className="flex gap-2">
             <input
               type="text"
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Type a message..."
-              className="flex-1 bg-surface border border-border rounded-lg px-4 py-2 text-sm text-white placeholder-muted focus:outline-none focus:border-accent"
+              className="ui-input"
             />
-            <button
-              type="submit"
-              disabled={sending}
-              className="px-4 py-2 bg-accent hover:bg-accent-hover disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
-            >
+            <button type="submit" disabled={sending} className="ui-btn ui-btn-primary disabled:opacity-50">
               {sending ? 'Thinking…' : 'Send'}
             </button>
           </div>
         </form>
-      </div>
+      </section>
     </div>
   );
 }

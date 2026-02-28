@@ -63,29 +63,22 @@ export default function AgentsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold">Workers (Office)</h2>
-        <Link
-          href="/chats"
-          className="px-4 py-2 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors"
-        >
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-3xl font-bold text-white">Workers (Office)</h2>
+        <Link href="/chats" className="ui-btn ui-btn-primary">
           New chat (creates worker)
         </Link>
       </div>
 
-      {error && (
-        <p className="mb-4 text-sm text-yellow-400">
-          {error}
-        </p>
-      )}
+      {error && <p className="mb-4 text-sm text-amber-300">{error}</p>}
 
       {loading ? (
-        <p className="text-sm text-muted">Loading workers…</p>
+        <p className="text-sm text-white/60">Loading workers…</p>
       ) : (
-        <div className="bg-panel border border-border rounded-xl overflow-hidden">
+        <div className="ui-surface overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border text-muted text-left">
+              <tr className="border-b border-white/10 text-left text-white/60">
                 <th className="px-5 py-3 font-medium">Name</th>
                 <th className="px-5 py-3 font-medium">Area</th>
                 <th className="px-5 py-3 font-medium">Sub-area</th>
@@ -96,33 +89,30 @@ export default function AgentsPage() {
             </thead>
             <tbody>
               {agents.map((a) => (
-                <tr key={a._id} className="border-b border-border/50 hover:bg-white/[0.02]">
-                  <td className="px-5 py-3 text-white font-medium">{a.name}</td>
-                  <td className="px-5 py-3 text-muted">{a.area ?? '—'}</td>
-                  <td className="px-5 py-3 text-muted">{a.subArea ?? '—'}</td>
+                <tr key={a._id} className="border-b border-white/5 hover:bg-white/[0.02]">
+                  <td className="px-5 py-3 font-medium text-white">{a.name}</td>
+                  <td className="px-5 py-3 text-white/70">{a.area ?? '—'}</td>
+                  <td className="px-5 py-3 text-white/70">{a.subArea ?? '—'}</td>
                   <td className="px-5 py-3">
                     <span
-                      className={`inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full ${
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${
                         a.status === 'active' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'
                       }`}
                     >
                       <span
-                        className={`w-1.5 h-1.5 rounded-full ${a.status === 'active' ? 'bg-green-400' : 'bg-yellow-400'}`}
+                        className={`h-1.5 w-1.5 rounded-full ${a.status === 'active' ? 'bg-green-400' : 'bg-yellow-400'}`}
                       />
                       {a.status}
                     </span>
                   </td>
-                  <td className="px-5 py-3 text-muted">{formatLastActivity(a.lastActivity)}</td>
+                  <td className="px-5 py-3 text-white/70">{formatLastActivity(a.lastActivity)}</td>
                   <td className="px-5 py-3">
                     {a.chatId ? (
-                      <Link
-                        href={`/chats?chatId=${encodeURIComponent(a.chatId)}`}
-                        className="text-accent hover:underline text-xs font-medium"
-                      >
+                      <Link href={`/chats?chatId=${encodeURIComponent(a.chatId)}`} className="text-sm text-cyan-300 hover:underline">
                         Open chat
                       </Link>
                     ) : (
-                      <span className="text-muted/60 text-xs">—</span>
+                      <span className="text-xs text-white/40">—</span>
                     )}
                   </td>
                 </tr>
@@ -130,7 +120,7 @@ export default function AgentsPage() {
             </tbody>
           </table>
           {agents.length === 0 && !loading && (
-            <p className="p-6 text-sm text-muted text-center">
+            <p className="p-6 text-center text-sm text-white/60">
               No workers yet. Create a chat to add a worker (each chat is backed by one sub-agent).
             </p>
           )}

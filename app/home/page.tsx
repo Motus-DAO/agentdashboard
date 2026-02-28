@@ -7,28 +7,43 @@ const STATS = [
 
 export default function HomePage() {
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-6">Overview</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="space-y-8">
+      <section>
+        <h2 className="ui-title-gradient text-3xl font-bold">Overview</h2>
+        <p className="mt-2 text-base text-white/70">Live operational metrics for the AgentMotus stack.</p>
+      </section>
+
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {STATS.map((s) => (
-          <div key={s.label} className="bg-panel border border-border rounded-xl p-5">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-2xl">{s.icon}</span>
-              <span className="text-2xl font-bold text-white">{s.value}</span>
+          <article key={s.label} className="ui-card">
+            <div className="mb-3 flex items-center gap-3">
+              <span className="text-2xl" aria-hidden="true">
+                {s.icon}
+              </span>
+              <span className="ui-title-gradient font-heading text-3xl font-bold">{s.value}</span>
             </div>
-            <p className="text-sm text-muted">{s.label}</p>
-          </div>
+            <p className="text-sm text-white/70">{s.label}</p>
+          </article>
         ))}
-      </div>
-      <div className="bg-panel border border-border rounded-xl p-5">
-        <h3 className="font-semibold mb-3">Recent Activity</h3>
-        <ul className="space-y-2 text-sm text-muted">
-          <li>🟢 <b className="text-white">AgentMotus</b> completed task <code>deploy-landing</code></li>
-          <li>🔵 <b className="text-white">ResearchAgent</b> started run <code>funding-scan-v2</code></li>
-          <li>💬 New message in <b className="text-white">#general</b> from Gerry</li>
-          <li>🔐 Wallet <code>0x7a3…f12</code> created by <b className="text-white">Admin</b></li>
+      </section>
+
+      <section className="ui-card">
+        <h3 className="text-xl font-semibold text-white">Recent Activity</h3>
+        <ul className="mt-3 space-y-2 text-sm text-white/70">
+          <li>
+            🟢 <b className="text-white">AgentMotus</b> completed task <code className="font-mono">deploy-landing</code>
+          </li>
+          <li>
+            🔵 <b className="text-white">ResearchAgent</b> started run <code className="font-mono">funding-scan-v2</code>
+          </li>
+          <li>
+            💬 New message in <b className="text-white">#general</b> from Gerry
+          </li>
+          <li>
+            🔐 Wallet <code className="font-mono">0x7a3…f12</code> created by <b className="text-white">Admin</b>
+          </li>
         </ul>
-      </div>
+      </section>
     </div>
   );
 }

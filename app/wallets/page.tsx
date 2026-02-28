@@ -13,35 +13,35 @@ const ACTIVITY = [
 export default function WalletsPage() {
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold">Wallets</h2>
-        <button className="px-4 py-2 bg-accent hover:bg-accent-hover text-white text-sm font-medium rounded-lg transition-colors">
-          + Create Wallet
-        </button>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-3xl font-bold text-white">Wallets</h2>
+        <button className="ui-btn ui-btn-primary">+ Create Wallet</button>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+
+      <section className="mb-8 grid grid-cols-1 gap-4 lg:grid-cols-3">
         {WALLETS.map((w) => (
-          <div key={w.address} className="bg-panel border border-border rounded-xl p-5">
-            <div className="flex items-center justify-between mb-3">
+          <article key={w.address} className="ui-card">
+            <div className="mb-3 flex items-center justify-between gap-4">
               <span className="text-sm font-bold text-white">{w.label}</span>
-              <span className="text-xs text-muted font-mono">{w.address}</span>
+              <span className="font-mono text-xs text-white/70">{w.address}</span>
             </div>
-            <p className="text-2xl font-bold text-white mb-1">{w.balance}</p>
-            <p className="text-xs text-muted mb-2">Provider: {w.provider}</p>
-            <p className="text-xs text-muted">Permissions: {w.permissions}</p>
-          </div>
+            <p className="ui-title-gradient font-heading text-3xl font-bold">{w.balance}</p>
+            <p className="mt-1 text-sm text-white/70">Provider: {w.provider}</p>
+            <p className="text-sm text-white/70">Permissions: {w.permissions}</p>
+          </article>
         ))}
-      </div>
-      <div className="bg-panel border border-border rounded-xl p-5">
-        <h3 className="font-semibold mb-3">Recent Wallet Activity</h3>
-        <ul className="space-y-2 text-sm text-muted">
+      </section>
+
+      <section className="ui-card">
+        <h3 className="text-xl font-semibold text-white">Recent Wallet Activity</h3>
+        <ul className="mt-3 space-y-2 text-sm text-white/70">
           {ACTIVITY.map((a, i) => (
             <li key={i}>
-              <b className="text-white">{a.action}</b> on <code>{a.wallet}</code> by {a.by} — {a.time}
+              <b className="text-white">{a.action}</b> on <code className="font-mono">{a.wallet}</code> by {a.by} — {a.time}
             </li>
           ))}
         </ul>
-      </div>
+      </section>
     </div>
   );
 }
